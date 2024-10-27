@@ -40,7 +40,7 @@ with col2:
 
 # Input for content and k (number of words to predict)
 content = st.text_input("**Enter some content:**")
-k = st.number_input("**Number of words to predict:**", min_value=1, max_value=20, value=5)
+k = st.number_input("**Number of words to predict:**", min_value=1, max_value=100, value=5)
 
 model_mapping = {
     (5, 64, 'relu', 42): 'model_variants\model_variant_1.pth',
