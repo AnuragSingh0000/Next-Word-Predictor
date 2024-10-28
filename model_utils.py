@@ -54,7 +54,7 @@ def generate_next_words(model, itos, stoi, content, seed_value, k, temperature=1
             logits = y_pred
             logits = logits/temperature
 
-            ix = torch.distributions.categorical.Categorical(logits=y_pred).sample().item()
+            ix = torch.distributions.categorical.Categorical(logits=logits).sample().item()
             word = itos[ix]
             content += " " + word
             context = context [1:] + [ix]
@@ -72,7 +72,7 @@ def generate_next_words(model, itos, stoi, content, seed_value, k, temperature=1
         y_pred = model(x)
         logits = y_pred
         logits = logits/temperature
-        ix = torch.distributions.categorical.Categorical(logits=y_pred).sample().item()
+        ix = torch.distributions.categorical.Categorical(logits=logits).sample().item()
         word = itos[ix]
         content += " " + word
         context = context [1:] + [ix]
