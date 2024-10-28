@@ -30,7 +30,7 @@ itos={i:s for s,i in stoi.items()}
 
 # Generate names from trained model
 
-def generate_next_words(model, itos, stoi, content, seed_value, k, max_len=10):
+def generate_next_words(model, itos, stoi, content, seed_value, k, temperature=1.0, max_len=10):
     torch.manual_seed(seed_value)
     
     block_size = model.block_size
@@ -52,6 +52,7 @@ def generate_next_words(model, itos, stoi, content, seed_value, k, max_len=10):
             x = torch.tensor(context).view(1, -1).to(device)
             y_pred = model(x)
             logits = y_pred
+            logits = logits/temperature
 
             ix = torch.distributions.categorical.Categorical(logits=y_pred).sample().item()
             word = itos[ix]
@@ -70,7 +71,7 @@ def generate_next_words(model, itos, stoi, content, seed_value, k, max_len=10):
         x = torch.tensor(context).view(1, -1).to(device)
         y_pred = model(x)
         logits = y_pred
-        
+        logits = logits/temperature
         ix = torch.distributions.categorical.Categorical(logits=y_pred).sample().item()
         word = itos[ix]
         content += " " + word

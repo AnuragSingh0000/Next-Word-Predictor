@@ -1,7 +1,11 @@
-import torch
+import time
 import streamlit as st
 import base64
 from model_utils import stoi, itos, generate_next_words, Next_Word_Predictor, load_pretrained_model
+import warnings
+
+# Suppressing all warnings
+warnings.filterwarnings("ignore")
 
 # Streamlit app title
 st.title("Next Word Predictor")
@@ -11,19 +15,19 @@ def get_svg_as_base64(svg_file_path):
     with open(svg_file_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# Load the help icon SVG
+# Loading the help icon SVG
 help_icon_base64 = get_svg_as_base64("assets\help_icon.svg")
 
 # Hyperparameter options
-context_length_options = [5, 15]  # Example values
-embedding_dim_options = [64, 128]  # Example values
-activation_fn_options = ['relu', 'sigmoid']  # Example values
-random_seed_options = [42, 99]  # Example values
+context_length_options = [5, 15]  
+embedding_dim_options = [64, 128]  
+activation_fn_options = ['relu', 'sigmoid']  
+random_seed_options = [42, 99]  
 
-# Create two columns for hyperparameter selection
+# Two columns for hyperparameter selection
 col1, col2 = st.columns(2)
 
-# Add dropdowns for hyperparameters with help icons next to the labels
+# Adding dropdowns for hyperparameters
 with col1:
     st.markdown(f"**Choose Context Length:** <img src='data:image/svg+xml;base64,{help_icon_base64}' title='Number of previous tokens to consider.' width='15' height='15' style='vertical-align: middle;'>", unsafe_allow_html=True)
     context_length = st.selectbox(" ", context_length_options)
@@ -38,9 +42,13 @@ with col2:
     st.markdown(f"**Choose Random Seed:** <img src='data:image/svg+xml;base64,{help_icon_base64}' title='Seed value for random state of the model.' width='15' height='15' style='vertical-align: middle;'>", unsafe_allow_html=True)
     random_seed = st.selectbox(" ", random_seed_options)
 
+# Asking for the temperature of predictions
+st.markdown(f"**Choose Temperature:** <img src='data:image/svg+xml;base64,{help_icon_base64}' title='Controls the randomness of predictions: lower values make the output more deterministic, while higher values increase diversity.' width='15' height='15' style='vertical-align: middle;'>", unsafe_allow_html=True)
+temperature = st.slider(" ", min_value=0.0, max_value=2.0, value=1.0, step=0.1)
+
 # Input for content and k (number of words to predict)
 content = st.text_input("**Enter some content:**")
-k = st.number_input("**Number of words to predict:**", min_value=1, max_value=100, value=5)
+k = st.number_input("**Number of words to predict:**", min_value=1, max_value=100, value=10)
 
 model_mapping = {
     (5, 64, 'relu', 42): 'model_variants\model_variant_1.pth',
@@ -64,19 +72,32 @@ model_mapping = {
 
 # Button to trigger prediction
 if st.button("Predict Next Words"):
-    # Create the key based on selected hyperparameters
     selected_key = (context_length, embedding_dim, activation_fn, random_seed)
-
-    # Retrieve the model path using the dictionary
     model_path = model_mapping.get(selected_key, None)
 
-    # If model exists for the selected hyperparameters, load and predict
     if model_path:
         model = load_pretrained_model(model_path)
         model.eval()
         if model:  # Proceed only if the model was successfully loaded
-            para = generate_next_words(model, itos, stoi, content, 42, k)
+            para = generate_next_words(model, itos, stoi, content, 42, k, temperature)
             st.subheader("Content with Predicted Next Words")
-            st.write(para)
+            # Placeholder for typewriter effect
+            placeholder = st.empty()
+
+            original_length = len(content)  # Length of original content
+            typed_text = ""
+            highlighted_text = ""
+
+            for char in para:
+                typed_text += char
+                # Highlight predicted text after the original content
+                if len(typed_text) > original_length:
+                    highlighted_text = f"<span style='color: #ff4b4b; font-weight: semi-bold;'>{typed_text[original_length:]}</span>"
+                    display_text = content + highlighted_text
+                else:
+                    display_text = content[:len(typed_text)]
+                
+                placeholder.markdown(display_text, unsafe_allow_html=True)  
+                time.sleep(0.02)  # Adding a small delay for typewriter effect
     else:
         st.error("No model found for the selected hyperparameter combination.")
