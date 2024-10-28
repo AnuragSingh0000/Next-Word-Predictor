@@ -19,7 +19,8 @@
 2. Convert the text to lowercase and use unique words to create the vocabulary.  
 3. To create X, and y pairs for training, you can use a similar approach used for next-character prediction. For example:
 
-   ![Example_dataset](assets\example_dataset.png)
+
+   ![example_dataset](https://github.com/user-attachments/assets/a4c28166-201c-4941-a768-d8deb7956963)
 
 
    You will get something like *“. . . . . \---\> to”* whenever there is a paragraph change. 
