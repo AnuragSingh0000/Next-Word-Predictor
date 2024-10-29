@@ -4,13 +4,18 @@ import base64
 from PIL import Image
 from model_utils import stoi, itos, generate_next_words, Next_Word_Predictor, load_pretrained_model
 import warnings
+import os  
 
 # Suppressing all warnings
 warnings.filterwarnings("ignore")
 
+assets_dir = os.path.join('assets')
+model_variants_dir = os.path.join('model_variants')
+
 # Loading Image using PIL
-im = Image.open('assets\App-Icon.png')
-st.set_page_config(page_title="Next Word Predictor App", page_icon = im)
+icon_path = os.path.join(assets_dir, 'App-Icon.png')
+im = Image.open(icon_path)
+st.set_page_config(page_title="Next Word Predictor App", page_icon=im)
 
 # Streamlit app title
 st.title("Next Word Predictor")
@@ -21,13 +26,14 @@ def get_svg_as_base64(svg_file_path):
         return base64.b64encode(f.read()).decode()
 
 # Loading the help icon SVG
-help_icon_base64 = get_svg_as_base64("assets\help_icon.svg")
+help_icon_path = os.path.join(assets_dir, "help_icon.svg")
+help_icon_base64 = get_svg_as_base64(help_icon_path)
 
 # Hyperparameter options
-context_length_options = [5, 15]  
-embedding_dim_options = [64, 128]  
-activation_fn_options = ['relu', 'sigmoid']  
-random_seed_options = [42, 99]  
+context_length_options = [5, 15]
+embedding_dim_options = [64, 128]
+activation_fn_options = ['relu', 'sigmoid']
+random_seed_options = [42, 99]
 
 # Two columns for hyperparameter selection
 col1, col2 = st.columns(2)
@@ -55,25 +61,25 @@ temperature = st.slider(" ", min_value=0.1, max_value=2.0, value=1.0, step=0.1)
 content = st.text_input("**Enter some content:**")
 k = st.number_input("**Number of words to predict:**", min_value=1, max_value=100, value=10)
 
+# Model file mapping with dynamic paths
 model_mapping = {
-    (5, 64, 'relu', 42): 'model_variants\model_variant_1.pth',
-    (5, 64, 'relu', 99): 'model_variants\model_variant_2.pth',
-    (5, 64, 'sigmoid', 42): 'model_variants\model_variant_3.pth',
-    (5, 64, 'sigmoid', 99): 'model_variants\model_variant_4.pth',
-    (5, 128, 'relu', 42): 'model_variants\model_variant_5.pth',
-    (5, 128, 'relu', 99): 'model_variants\model_variant_6.pth',
-    (5, 128, 'sigmoid', 42): 'model_variants\model_variant_7.pth',
-    (5, 128, 'sigmoid', 99): 'model_variants\model_variant_8.pth',
-    (15, 64, 'relu', 42): 'model_variants\model_variant_9.pth',
-    (15, 64, 'relu', 99): 'model_variants\model_variant_10.pth',
-    (15, 64, 'sigmoid', 42): 'model_variants\model_variant_11.pth',
-    (15, 64, 'sigmoid', 99): 'model_variants\model_variant_12.pth',
-    (15, 128, 'relu', 42): 'model_variants\model_variant_13.pth',
-    (15, 128, 'relu', 99): 'model_variants\model_variant_14.pth',
-    (15, 128, 'sigmoid', 42): 'model_variants\model_variant_15.pth',
-    (15, 128, 'sigmoid', 99): 'model_variants\model_variant_16.pth',
+    (5, 64, 'relu', 42): os.path.join(model_variants_dir, 'model_variant_1.pth'),
+    (5, 64, 'relu', 99): os.path.join(model_variants_dir, 'model_variant_2.pth'),
+    (5, 64, 'sigmoid', 42): os.path.join(model_variants_dir, 'model_variant_3.pth'),
+    (5, 64, 'sigmoid', 99): os.path.join(model_variants_dir, 'model_variant_4.pth'),
+    (5, 128, 'relu', 42): os.path.join(model_variants_dir, 'model_variant_5.pth'),
+    (5, 128, 'relu', 99): os.path.join(model_variants_dir, 'model_variant_6.pth'),
+    (5, 128, 'sigmoid', 42): os.path.join(model_variants_dir, 'model_variant_7.pth'),
+    (5, 128, 'sigmoid', 99): os.path.join(model_variants_dir, 'model_variant_8.pth'),
+    (15, 64, 'relu', 42): os.path.join(model_variants_dir, 'model_variant_9.pth'),
+    (15, 64, 'relu', 99): os.path.join(model_variants_dir, 'model_variant_10.pth'),
+    (15, 64, 'sigmoid', 42): os.path.join(model_variants_dir, 'model_variant_11.pth'),
+    (15, 64, 'sigmoid', 99): os.path.join(model_variants_dir, 'model_variant_12.pth'),
+    (15, 128, 'relu', 42): os.path.join(model_variants_dir, 'model_variant_13.pth'),
+    (15, 128, 'relu', 99): os.path.join(model_variants_dir, 'model_variant_14.pth'),
+    (15, 128, 'sigmoid', 42): os.path.join(model_variants_dir, 'model_variant_15.pth'),
+    (15, 128, 'sigmoid', 99): os.path.join(model_variants_dir, 'model_variant_16.pth'),
 }
-
 
 # Button to trigger prediction
 if st.button("Predict Next Words"):
