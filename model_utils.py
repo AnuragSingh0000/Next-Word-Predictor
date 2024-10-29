@@ -3,9 +3,11 @@ import torch.nn as nn
 import re
 import pandas as pd
 import streamlit as st
+import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-file_path = 'assets\leo-tolstoy-war-and-peace.txt'
+file_path = os.path.join('assets', 'leo-tolstoy-war-and-peace.txt')
+
 
 with open(file_path, 'r', encoding='utf-8') as file:
     text = file.read()
@@ -31,7 +33,7 @@ itos={i:s for s,i in stoi.items()}
 # Generate names from trained model
 
 def generate_next_words(model, itos, stoi, content, seed_value, k, temperature=1.0, max_len=10):
-    torch.manual_seed(seed_value)
+    # torch.manual_seed(seed_value)
     
     block_size = model.block_size
     context = content.lower()
