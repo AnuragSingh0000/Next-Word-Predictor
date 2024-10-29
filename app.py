@@ -1,11 +1,16 @@
 import time
 import streamlit as st
 import base64
+from PIL import Image
 from model_utils import stoi, itos, generate_next_words, Next_Word_Predictor, load_pretrained_model
 import warnings
 
 # Suppressing all warnings
 warnings.filterwarnings("ignore")
+
+# Loading Image using PIL
+im = Image.open('assets\App-Icon.png')
+st.set_page_config(page_title="Next Word Predictor App", page_icon = im)
 
 # Streamlit app title
 st.title("Next Word Predictor")
@@ -44,7 +49,7 @@ with col2:
 
 # Asking for the temperature of predictions
 st.markdown(f"**Choose Temperature:** <img src='data:image/svg+xml;base64,{help_icon_base64}' title='Controls the randomness of predictions: lower values make the output more deterministic, while higher values increase diversity.' width='15' height='15' style='vertical-align: middle;'>", unsafe_allow_html=True)
-temperature = st.slider(" ", min_value=0.0, max_value=2.0, value=1.0, step=0.1)
+temperature = st.slider(" ", min_value=0.1, max_value=2.0, value=1.0, step=0.1)
 
 # Input for content and k (number of words to predict)
 content = st.text_input("**Enter some content:**")
